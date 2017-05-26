@@ -230,7 +230,7 @@ elif args.action == 'transfer':
 	import_policy(src_policy, 'from_json_memory')
 
 else:
-	print "Error: action was not one of 'export_json/import_csv/transfer'."
+	print "Error: action was not one of 'export_json/import_csv/import_json/transfer'."
 	print "Please rerun the script providing a correct action argument"
 
 #Tests we should run:
