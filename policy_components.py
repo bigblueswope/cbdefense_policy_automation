@@ -180,7 +180,7 @@ sensor_config = {
         },
         {
             'name': 'SHOW_FULL_UI',
-            'value': 'true'
+            'value': 'false'
         },
         {
             'name': 'HELP_MESSAGE',
