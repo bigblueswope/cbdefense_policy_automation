@@ -22,7 +22,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: export_json,import_csv,import_json,transfer", required=True)
+parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: import_csv,import_json,export_json,transfer", required=True)
 parser.add_argument("-i", "--input", help="File containing rules or policy to import.")
 parser.add_argument("-o", "--output", help="File to which to write policy JSON. Just in case you wish to verify the JSON.")
 args = parser.parse_args()
