@@ -38,21 +38,21 @@ def data_validation_error(input_string, field_numb):
 
 def app_match(input_string):
 	for k in apps.keys():
-		if input_string.startswith(k):
+		if input_string.upper().startswith(k.upper()):
 			return (apps[k]['type'], apps[k]['value'])
 	#if we get to here, the 1st field on a line does not match our rule types.
 	data_validation_error(input_string, 1)
 
 def op_match(input_string):
 	for k in ops.keys():
-		if input_string.startswith(k):
+		if input_string.upper().startswith(k.upper()):
 			return (ops[k])
 	#if we got to here, the 2nd field on a line does not match our rule operations.
 	data_validation_error(input_string, 2)
 
 def action_match(input_string):
 	for k in actions.keys():
-		if input_string.startswith(k):
+		if input_string.upper().startswith(k.upper()):
 			return (actions[k])
 	#if we got to here, the 3rd field on a line does not match our rule actions.
 	data_validation_error(input_string, 3)
