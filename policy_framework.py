@@ -108,7 +108,7 @@ def login(session, user, password, host):
 		csrf = json.dumps(response.json()['csrf']).replace('"', '')
 		return csrf
 	else:
-		print 'Error: No csrf record. Authentication failed'
+		print 'Error: Authentication failed.'
 		sys.exit(1)
 
 def web_get(session, host, uri, request_headers):

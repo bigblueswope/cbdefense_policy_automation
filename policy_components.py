@@ -99,93 +99,79 @@ sensor_config = {
     'sensorAutoUpdateEnabled': 'true',
     'sensorSettings': [
         {
-            'name': 'ALLOW_UPLOADS',
-            'value': 'false'
+            "name": "ALLOW_UPLOADS",
+            "value": "true"
         },
         {
-            'name': 'SHOW_UI',
-            'value': 'true'
+            "name": "SHOW_UI",
+            "value": "true"
         },
         {
-            'name': 'BACKGROUND_SCAN',
-            'value': 'true'
+            "name": "BACKGROUND_SCAN",
+            "value": "true"
         },
         {
-            'name': 'POLICY_ACTION_OVERRIDE',
-            'value': 'true'
+            "name": "QUARANTINE_DEVICE_MESSAGE",
+            "value": "Device has been quarantined by your computer administrator."
         },
         {
-            'name': 'QUARANTINE_DEVICE_MESSAGE',
-            'value': 'Your device has been quarantined by your Cb Defense administrator.'
+            "name": "LOGGING_LEVEL",
+            "value": "NORMAL"
         },
         {
-            'name': 'LOGGING_LEVEL',
-            'value': 'NORMAL'
+            "name": "QUARANTINE_DEVICE",
+            "value": "false"
         },
         {
-            'name': 'ALLOW_UNINSTALL',
-            'value': 'true'
+            "name": "PRESERVE_SYSTEM_MEMORY_SCAN",
+            "value": "false"
         },
         {
-            'name': 'QUARANTINE_DEVICE',
-            'value': 'false'
+            "name": "HASH_MD5",
+            "value": "true"
         },
         {
-            'name': 'RATE_LIMIT',
-            'value': '0'
+            "name": "SCAN_LARGE_FILE_READ",
+            "value": "false"
         },
         {
-            'name': 'CONNECTION_LIMIT',
-            'value': '0'
+            "name": "POLICY_ACTION_OVERRIDE",
+            "value": "true"
         },
         {
-            'name': 'QUEUE_SIZE',
-            'value': '100'
+            "name": "ALLOW_UNINSTALL",
+            "value": "true"
         },
         {
-            'name': 'LEARNING_MODE',
-            'value': '0'
+            "name": "SCAN_NETWORK_DRIVE",
+            "value": "true"
         },
         {
-            'name': 'SCAN_NETWORK_DRIVE',
-            'value': 'false'
+            "name": "BYPASS_AFTER_LOGIN_MINS",
+            "value": "0"
         },
         {
-            'name': 'BYPASS_AFTER_LOGIN_MINS',
-            'value': '0'
+            "name": "BYPASS_AFTER_RESTART_MINS",
+            "value": "0"
         },
         {
-            'name': 'BYPASS_AFTER_RESTART_MINS',
-            'value': '0'
+            "name": "SCAN_EXECUTE_ON_NETWORK_DRIVE",
+            "value": "true"
         },
         {
-            'name': 'SCAN_EXECUTE_ON_NETWORK_DRIVE',
-            'value': 'true'
+            "name": "DELAY_EXECUTE",
+            "value": "true"
         },
         {
-            'name': 'DELAY_EXECUTE',
-            'value': 'true'
+            "name": "SHOW_FULL_UI",
+            "value": "false"
         },
         {
-            'name': 'PRESERVE_SYSTEM_MEMORY_SCAN',
-            'value': 'false'
-        },
-        {
-            'name': 'HASH_MD5',
-            'value': 'false'
-        },
-        {
-            'name': 'SCAN_LARGE_FILE_READ',
-            'value': 'false'
-        },
-        {
-            'name': 'SHOW_FULL_UI',
-            'value': 'false'
-        },
-        {
-            'name': 'HELP_MESSAGE',
-            'value': ''
+            "name": "HELP_MESSAGE",
+            "value": ""
         }
-    ]
+
+    ],
+    "updateVersion": 0
 }
 
