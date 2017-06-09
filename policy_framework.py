@@ -15,7 +15,7 @@ def prettyPrint(entry):
 
 def check_request_version():
 	req_ver = requests.__version__
-	if req_ver != '2.14.2':
+	if req_ver < '2.14.2':
 		print "WARNING: Your version of the Python module 'requests' is not the most up-to-date.\n\
 If you have errors related to 'requests' upgrade to the latest version using:\n\t\
 sudo pip install requests --upgrade"
