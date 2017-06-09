@@ -31,6 +31,7 @@ apps = policy_components.applications
 ops = policy_components.operations
 actions = policy_components.actions
 
+
 def data_validation_error(input_string, field_numb):
 	print "CSV contains invalid data in field %i (printed below).  Fix data and try again." % (field_numb)
 	print input_string
@@ -210,6 +211,7 @@ def export_policy(exp_type):
 
 
 policy.check_request_version()
+
 if args.action == 'export_json':
 	export_policy('to_json_file')
 
