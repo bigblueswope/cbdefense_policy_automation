@@ -1,3 +1,4 @@
+import collections
 
 applications = {
     'When known malware that has a verified signature': {'type': 'REPUTATION', 'value': 'KNOWN_MALWARE'},
@@ -24,6 +25,14 @@ actions = {
     'Allow': 'ALLOW',
     'Ignore': 'IGNORE'
 }
+
+defense_servers = collections.OrderedDict()
+defense_servers['prod'] = 'https://dashboard.confer.net/'
+defense_servers['prod02'] = 'https://defense.conferdeploy.net/'
+defense_servers['prod05'] = 'https://defense-prod05.conferdeploy.net/'
+defense_servers['prod06'] = 'https://defense-eu.conferdeploy.net/'
+defense_servers['eap'] = 'https://defense-eap01.conferdeploy.net/'
+defense_servers['other'] = 'Any Server Not Listed. Will require manual URL entry.'
 
 # If you desire something other than what is set here
 #  You can edit the values in av_config and the policy

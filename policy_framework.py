@@ -6,6 +6,8 @@ import json
 import requests
 import getpass
 import requests.packages.urllib3
+import policy_components
+
 requests.packages.urllib3.disable_warnings()
 
 def prettyPrint(entry):
@@ -19,8 +21,28 @@ If you have errors related to 'requests' upgrade to the latest version using:\n\
 sudo pip install requests --upgrade"
 		raw_input("Press 'Enter' to continue")
 
+def list_servers():
+	defense_servers = policy_components.defense_servers
+	cntr = 0
+	for k in defense_servers:
+		print "%s) %s: %s" % (str(cntr).rjust(2), k.ljust(6), defense_servers[k])
+		cntr +=1
+
 def get_cbd_instance(src_or_dst):
-	host = raw_input("Please enter the ****%s*** CbD console URL\n(default is https://defense-prod05.conferdeploy.net): " % (src_or_dst))
+	list_servers()
+	host_int = raw_input("****%s**** server.\nPlease choose a number from list of available Cb Defense Servers: " % (src_or_dst))
+	try:
+		host_int = int(host_int)
+	except:
+		print "Expected an integer input.  Re-run the tool and input an integer."
+		sys.exit()
+	
+	if host_int >= len(policy_components.defense_servers):
+		host = raw_input("Please enter the ****%s**** CbD console URL\n(example: https://host.conferdeploy.net/): " % (src_or_dst))
+	else:
+		host = policy_components.defense_servers.values()[host_int]
+		print "%s Server: %s" % (src_or_dst, host)
+	
 	if len(host) == 0:
 		host = "https://defense-prod05.conferdeploy.net"
 
