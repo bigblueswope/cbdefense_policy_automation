@@ -21,16 +21,6 @@ import policy_framework as policy
 pp = pprint.PrettyPrinter(indent=4)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: import_csv,import_json,export_json,transfer", required=True)
-parser.add_argument("-i", "--input", help="File containing rules or policy to import.")
-parser.add_argument("-o", "--output", help="File to which to write policy JSON. Just in case you wish to verify the JSON.")
-args = parser.parse_args()
-
-apps = policy_components.applications
-ops = policy_components.operations
-actions = policy_components.actions
-
 
 def data_validation_error(input_string, field_numb):
 	print "CSV contains invalid data in field %i (printed below).  Fix data and try again." % (field_numb)
@@ -210,30 +200,46 @@ def export_policy(exp_type):
 			print "Export type not specified.  No data exported."
 
 
-policy.check_request_version()
 
-if args.action == 'export_json':
-	export_policy('to_json_file')
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: import_csv,import_json,export_json,transfer", required=True)
+	parser.add_argument("-i", "--input", help="File containing rules or policy to import.")
+	parser.add_argument("-o", "--output", help="File to which to write policy JSON. Just in case you wish to verify the JSON.")
+	args = parser.parse_args()
+	
+	apps = policy_components.applications
+	ops = policy_components.operations
+	actions = policy_components.actions
+	
+	policy.check_request_version()
+	
+	if args.action == 'export_json':
+		export_policy('to_json_file')
+		
+	elif args.action == 'import_csv':
+		if not args.input:
+			args.input = raw_input("No Input File Specified.\nWhat CSV contains the rules to import?: ")
+		print "Using %s as rule source" % (args.input)
+		import_policy(args.input, 'from_csv')
+	
+	elif args.action == 'import_json':
+		if not args.input:
+			args.input = raw_input("No input file specified.\nWhat file contains the JSON policy to import?: ")
+		print "Using %s as rule source" % (args.input)
+		import_policy(args.input, 'from_json_file')
+	
+	elif args.action == 'transfer':
+		src_policy = export_policy('to_json_memory')
+		import_policy(src_policy, 'from_json_memory')
+	
+	else:
+		print "Error: action was not one of 'export_json/import_csv/import_json/transfer'."
+		print "Please rerun the script providing a correct action argument"
 
-elif args.action == 'import_csv':
-	if not args.input:
-		args.input = raw_input("No Input File Specified.\nWhat CSV contains the rules to import?: ")
-	print "Using %s as rule source" % (args.input)
-	import_policy(args.input, 'from_csv')
+if __name__ == "__main__":
+	main()
 
-elif args.action == 'import_json':
-	if not args.input:
-		args.input = raw_input("No input file specified.\nWhat file contains the JSON policy to import?: ")
-	print "Using %s as rule source" % (args.input)
-	import_policy(args.input, 'from_json_file')
-
-elif args.action == 'transfer':
-	src_policy = export_policy('to_json_memory')
-	import_policy(src_policy, 'from_json_memory')
-
-else:
-	print "Error: action was not one of 'export_json/import_csv/import_json/transfer'."
-	print "Please rerun the script providing a correct action argument"
 
 #Tests we should run:
 #	export_json
