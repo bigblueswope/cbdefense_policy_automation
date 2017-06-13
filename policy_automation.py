@@ -201,9 +201,34 @@ def export_policy(exp_type):
 
 
 
+def import_certs(infile):
+	print "\n##### Begin Certificate Import #####"
+	session =requests.Session()
+	host = policy.get_cbd_instance('DESTINATION')
+	user, password = policy.get_username_password('DESTINATION')
+	request_headers = policy.get_request_headers(host)
+	request_headers['X-CSRF-Token'] = policy.login(session, user, password, host)	
+	uri = '/settings/hashentry/add'
+	with open (infile, 'rb') as f:
+		reader = csv.reader(f)
+		for row in reader:
+			cert_dict = {}
+			cert_dict['description'] = row[3]
+			cert_dict['hashListType'] = "WHITE_LIST"
+			cert_dict['reputationOverrideType'] = "CERT"
+			cert_dict['value1'] = row[2]
+			cert_dict['value2'] = row[4]
+			print "Adding Certificate: %s" % (cert_dict['description'])
+			response = policy.web_post(session, host, uri, request_headers, cert_dict)
+	print "Certificate Import completed. Logging out."
+	uri = '/logout'
+	policy.web_get(session, host, uri, request_headers)
+
+
+
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: import_csv,import_json,export_json,transfer", required=True)
+	parser.add_argument("-a", "--action", help="Action to be taken.  Valid values: import_csv,import_json,export_json,transfer,import_certs", required=True)
 	parser.add_argument("-i", "--input", help="File containing rules or policy to import.")
 	parser.add_argument("-o", "--output", help="File to which to write policy JSON. Just in case you wish to verify the JSON.")
 	args = parser.parse_args()
@@ -223,6 +248,12 @@ def main():
 		print "Using %s as rule source" % (args.input)
 		import_policy(args.input, 'from_csv')
 	
+	elif args.action == 'import_cert':
+		if not args.input:
+			args.input = raw_input("No Input File Specified.\nWhat CSV contains the certs to import?: ")
+		print "Using %s as cert source" % (args.input)
+		import_certs(args.input)
+	
 	elif args.action == 'import_json':
 		if not args.input:
 			args.input = raw_input("No input file specified.\nWhat file contains the JSON policy to import?: ")
@@ -234,7 +265,7 @@ def main():
 		import_policy(src_policy, 'from_json_memory')
 	
 	else:
-		print "Error: action was not one of 'export_json/import_csv/import_json/transfer'."
+		print "Error: action was not one of 'export_json/import_csv/import_json/transfer/import_cert'."
 		print "Please rerun the script providing a correct action argument"
 
 if __name__ == "__main__":
