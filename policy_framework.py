@@ -23,21 +23,21 @@ sudo pip install requests --upgrade"
 
 def list_servers():
 	defense_servers = policy_components.defense_servers
-	cntr = 0
+	cntr = 1
 	for k in defense_servers:
 		print "%s) %s: %s" % (str(cntr).rjust(2), k.ljust(6), defense_servers[k])
 		cntr +=1
 
 def get_cbd_instance(src_or_dst):
 	list_servers()
-	host_int = raw_input("****%s**** server.\nPlease choose a number from list of available Cb Defense Servers: " % (src_or_dst))
+	host_raw = raw_input("****%s**** server.\nPlease choose a number from list of available Cb Defense Servers: " % (src_or_dst))
 	try:
-		host_int = int(host_int)
+		host_int = int(host_raw) - 1
 	except:
 		print "Expected an integer input.  Re-run the tool and input an integer."
 		sys.exit()
 	
-	if host_int >= len(policy_components.defense_servers):
+	if host_int >= (len(policy_components.defense_servers)-1):
 		host = raw_input("Please enter the ****%s**** CbD console URL\n(example: https://host.conferdeploy.net/): " % (src_or_dst))
 	else:
 		host = policy_components.defense_servers.values()[host_int]
