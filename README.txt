@@ -2,7 +2,9 @@ This is a python tool to allow one to easily:
 1.  Import a CSV full of Cb Defense rules to a policy in a CbD instance.
 2.  Import a JSON file containing an entire Cb Defense policy
 3.  Export the contents of a Cb Defense policy to a JSON file.
-4.  Transfer a policy from one Cb Defense organization to another.
+4.  Import certificates from a CSV.
+5.  Transfer a policy from one Cb Defense organization to another.
+6.  Edit an existing policy to add rules ("Blocking and Isolation" or Permissions) 
 
 The tool requires one to have a recent version of the Python library 'requests' installed.
 	To install 'requests' try the following command:
@@ -12,7 +14,7 @@ If you try to use pip and are told "sudo: pip: command not found" install pip us
 	sudo easy_install pip
 
 The tool is comprised of 3 Python files
-policy_automation.py  policy_components.py  policy_framework.py
+policy_automation.py  components.py  framework.py
 
 policy_automation.py is the script we will run, it will import the other two files when it runs.
 
@@ -32,8 +34,10 @@ The action argument tells the script which function you wish to perform.
 The valid actions are:
 	import_csv
 	import_json
+	import_certs
 	export_json
 	transfer
+	edit_policy
 
 The script supports 2 optional arguments as well:
 	-i or --input

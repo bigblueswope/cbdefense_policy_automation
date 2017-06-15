@@ -6,9 +6,11 @@ import json
 import requests
 import getpass
 import requests.packages.urllib3
-import policy_components
+import components as pc
 
 requests.packages.urllib3.disable_warnings()
+session = requests.Session()
+
 
 def prettyPrint(entry):
 	print json.dumps(entry, indent=4, sort_keys=True)
@@ -21,30 +23,56 @@ If you have errors related to 'requests' upgrade to the latest version using:\n\
 sudo pip install requests --upgrade"
 		raw_input("Press 'Enter' to continue")
 
+def data_validation_error(input_string, field_numb):
+    print "CSV contains invalid data in field %i (printed below).  Fix data and try again." % (field_numb)
+    print input_string
+    sys.exit(1)
+
+def app_match(input_string):
+    for k in pc.applications.keys():
+        if input_string.upper().startswith(k.upper()):
+            return (pc.applications[k]['type'], pc.applications[k]['value'])
+    #if we get to here, the 1st field on a line does not match our rule types.
+    data_validation_error(input_string, 1)
+
+def op_match(input_string):
+    for k in pc.operations.keys():
+        if input_string.upper().startswith(k.upper()):
+            return (pc.operations[k])
+    #if we got to here, the 2nd field on a line does not match our rule operations.
+    data_validation_error(input_string, 2)
+
+def action_match(input_string):
+    for k in pc.actions.keys():
+        if input_string.upper().startswith(k.upper()):
+            return (pc.actions[k])
+    #if we got to here, the 3rd field on a line does not match our rule actions.
+    data_validation_error(input_string, 3)
+
 def list_servers():
-	defense_servers = policy_components.defense_servers
-	cntr = 1
-	for k in defense_servers:
-		print "%s) %s: %s" % (str(cntr).rjust(2), k.ljust(6), defense_servers[k])
+	cntr = 0
+	for k in pc.defense_servers:
+		print "%s) %s: %s" % (str(cntr).rjust(2), k.ljust(6), pc.defense_servers[k])
 		cntr +=1
 
 def get_cbd_instance(src_or_dst):
 	list_servers()
 	host_raw = raw_input("****%s**** server.\nPlease choose a number from list of available Cb Defense Servers: " % (src_or_dst))
 	try:
-		host_int = int(host_raw) - 1
+		host_int = int(host_raw) 
 	except:
 		print "Expected an integer input.  Re-run the tool and input an integer."
 		sys.exit()
 	
-	if host_int >= (len(policy_components.defense_servers)-1):
+	if host_int >= (len(pc.defense_servers)-1):
 		host = raw_input("Please enter the ****%s**** CbD console URL\n(example: https://host.conferdeploy.net/): " % (src_or_dst))
 	else:
-		host = policy_components.defense_servers.values()[host_int]
+		host = pc.defense_servers.values()[host_int]
 		print "%s Server: %s" % (src_or_dst, host)
 	
 	if len(host) == 0:
-		host = "https://defense-prod05.conferdeploy.net"
+		print "No Cb Defense server specified.  Please rerun the tool and specify a CbD instance."
+		sys.exit(1)
 
 	if host.startswith('http://'):
 		host = re.sub('http://', 'https://', host)
@@ -56,25 +84,25 @@ def get_cbd_instance(src_or_dst):
 def get_username_password(src_or_dst):
 	uname = raw_input("%s Username: " % (src_or_dst))
 	if not uname:
-		print "Error: Username cannot be blank. Rerun the script."
+		print "Error: Username cannot be blank. Rerun the tool."
 		sys.exit(1)
 	pword = getpass.getpass("%s Password: " % (src_or_dst))
 	if not pword:
-		print "Error: Password cannot be blank. Rerun the script."
+		print "Error: Password cannot be blank. Rerun the tool."
 		sys.exit(1)
 	return uname, pword
 
 def get_policy_name(infile):
-	if type(infile) == 'string':
+	if isinstance(infile, basestring):
 		ppn = infile.split('.',1)[0]
 		print "DESTINATION Policy Name: %s" % (ppn)
-		pol_name = raw_input("Type you New Policy Name or just press 'Enter' to use '%s': " % (ppn))
+		pol_name = raw_input("Type your New Policy Name or just press 'Enter' to use '%s': " % (ppn))
 		if not pol_name:
 			pol_name = ppn
 	else:
 		pol_name = raw_input("DESTINATION Policy Name: ")
 		if not pol_name:
-			print "ERROR:  DESTINATION policy name cannot be blank.  Rerun the script and provide a name."
+			print "ERROR:  DESTINATION policy name cannot be blank.  Rerun the tool and provide a name."
 			sys.exit(1)
 	
 	return pol_name
@@ -85,7 +113,7 @@ def get_policy_description():
 
 def get_policy_priority():
 	valid_pol_pris = ['LOW', 'MEDIUM', 'HIGH', 'MISSION_CRITICAL']
-	pol_pri = raw_input("DESTINATION Policy Target Value: LOW MEDIUM HIGH MISSION_CRITICAL: [MEDIUM]")
+	pol_pri = raw_input("DESTINATION Policy Target Value: LOW MEDIUM HIGH MISSION_CRITICAL: [MEDIUM] ")
 	if len(pol_pri) == 0:
 		pol_pri = "MEDIUM"
 	if pol_pri in valid_pol_pris:
@@ -107,17 +135,9 @@ def get_policy_priority_level():
 	ppl = 3
 	return ppl
 	
-def get_request_headers(host):
-	referer = host + '/ui'
-	request_headers = {
-		'Host': host,
-		'Origin': host,
-		'Referer': referer
-	}
-	return request_headers
 
-def login(session, user, password, host):
-	request_headers = get_request_headers(host)
+def login(session, user, password, host, request_headers):
+	#request_headers = build_request_headers(host)
 	formdata = {'forward': '', 'email': user, 'password': password}
 	
 	url = host + '/checkAuthStrategy'
@@ -130,8 +150,9 @@ def login(session, user, password, host):
 		csrf = json.dumps(response.json()['csrf']).replace('"', '')
 		return csrf
 	else:
-		print 'Error: Authentication failed.'
+		print 'Error: Authentication failed. The username/password combination is not valid for %s' % (host)
 		sys.exit(1)
+
 
 def web_get(session, host, uri, request_headers):
 	try:
