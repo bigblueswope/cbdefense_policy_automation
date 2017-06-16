@@ -1,3 +1,6 @@
 2017-06-15:
 1.  Import Canned Queries.
 2.  Import Alerts.2017-06-15:
+
+2017-06-16:
+1.  Bulk edit - add rule(s) to more than one policy at a time
