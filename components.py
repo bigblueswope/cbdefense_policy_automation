@@ -136,7 +136,7 @@ policy_template = {
         }, 
         {
             "name": "BACKGROUND_SCAN", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "POLICY_ACTION_OVERRIDE", 
@@ -180,6 +180,10 @@ policy_template = {
         }, 
         {
             "name": "SHOW_FULL_UI", 
+            "value": "false"
+        },
+        {
+            "name": "SECURITY_CENTER_OPT",
             "value": "false"
         }
     ], 
