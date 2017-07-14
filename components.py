@@ -1,11 +1,11 @@
 import collections
 
 defense_servers = collections.OrderedDict()
-defense_servers['prod'] = 'https://dashboard.confer.net/'
-defense_servers['prod02'] = 'https://defense.conferdeploy.net/'
-defense_servers['prod05'] = 'https://defense-prod05.conferdeploy.net/'
-defense_servers['prod06'] = 'https://defense-eu.conferdeploy.net/'
-defense_servers['eap'] = 'https://defense-eap01.conferdeploy.net/'
+defense_servers['prod'] = 'https://dashboard.confer.net'
+defense_servers['prod02'] = 'https://defense.conferdeploy.net'
+defense_servers['prod05'] = 'https://defense-prod05.conferdeploy.net'
+defense_servers['prod06'] = 'https://defense-eu.conferdeploy.net'
+defense_servers['eap'] = 'https://defense-eap01.conferdeploy.net'
 defense_servers['other'] = 'Any Server Not Listed. Will require manual URL entry.'
 
 applications = {
@@ -52,7 +52,7 @@ policy_template = {
             }
         ], 
         "onAccessScan": {
-            "profile": "NORMAL"
+            "profile": "AGGRESSIVE"
         }, 
         "onDemandScan": {
             "profile": "NORMAL", 
@@ -136,7 +136,7 @@ policy_template = {
         }, 
         {
             "name": "BACKGROUND_SCAN", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "POLICY_ACTION_OVERRIDE", 
@@ -180,6 +180,10 @@ policy_template = {
         }, 
         {
             "name": "SHOW_FULL_UI", 
+            "value": "false"
+        },
+        {
+            "name": "SECURITY_CENTER_OPT",
             "value": "false"
         }
     ], 

@@ -2,6 +2,7 @@
 import sys
 import time
 import re
+import logging
 import json
 import requests
 import getpass
@@ -10,6 +11,8 @@ import components as pc
 
 requests.packages.urllib3.disable_warnings()
 session = requests.Session()
+
+log = logging.getLogger(__name__)
 
 
 def prettyPrint(entry):
@@ -79,7 +82,7 @@ def get_cbd_instance(src_or_dst):
 
 	if not host.startswith('https://'):
 		host = 'https://' + host
-	return host
+	return host.strip('/')
 
 def get_username_password(src_or_dst):
 	uname = raw_input("%s Username: " % (src_or_dst))
@@ -132,19 +135,18 @@ def get_policy_priority_level():
 	#ppl = raw_input("Policy Priority Level: [3] ")
 	#if len(ppl) == 0:
 	#	ppl = 3
-	ppl = 3
+	ppl = 50
 	return ppl
 	
 
-def login(session, user, password, host, request_headers):
-	#request_headers = build_request_headers(host)
+def login(session, user, password, host, requestHeaders):
 	formdata = {'forward': '', 'email': user, 'password': password}
 	
 	url = host + '/checkAuthStrategy'
-	response = session.post(url, data=formdata, headers=request_headers, timeout=30)
+	response = session.post(url, data=formdata, headers=requestHeaders, timeout=30)
 	
 	url = host + '/userInfo'
-	response = session.get(url, data=formdata, headers=request_headers, timeout=30)
+	response = session.get(url, data=formdata, headers=requestHeaders, timeout=30)
 	
 	if 'csrf' in response.json() and response.json()['csrf'] is not None:
 		csrf = json.dumps(response.json()['csrf']).replace('"', '')
@@ -154,12 +156,12 @@ def login(session, user, password, host, request_headers):
 		sys.exit(1)
 
 
-def web_get(session, host, uri, request_headers):
+def web_get(session, uri, host, requestHeaders):
 	try:
 		url = host + uri
-		response = session.get(url, headers=request_headers, timeout=30)
+		response = session.get(url, headers=requestHeaders, timeout=30)
 	except Exception as e:
-		print "GET request failed for the following URI: %s" % (uri)
+		print "GET request failed for the following URI: %s" % (url)
 		print "Exception: %s" % (e)
 		sys.exit(1)
 	try:
@@ -167,24 +169,25 @@ def web_get(session, host, uri, request_headers):
 	except Exception as e:
 		pass
 		
-def web_post(session, host, uri, request_headers, formdata):
+
+def web_post(session, uri, formdata, host, requestHeaders):
 	try:
 		url = host + uri
-		response = session.post(url, json=formdata, headers=request_headers, timeout=30)
-	except Exception as e:
-		print "POST request failed for the following URI: %s" % (uri)
+		response = session.post(url, json=formdata, headers=requestHeaders, timeout=30)
+		if response.json:
+			return response.json()
+		else:
+			return response.text
+	except IOError as e:
+		print "POST request failed for the following URI: %s%s" % (host,uri)
 		print "Exception: %s" % (e)
 		sys.exit(1)
 	print "URL = " + url + "\nStatus = " + str(response.status_code)
 	
-	try:
-		return response.json()
-	except Exception as e:
-		print "Exception: %s" % (e)
 		
 def does_policy_exist(jsonResponse):
 	if jsonResponse['groupAlreadyExists'] is True:
 		print "ERROR: A policy with this name already exists."
 		print "Re-run the import and create a policy with a new name."
-		sys.exit(1)
+		#sys.exit(1)
 
