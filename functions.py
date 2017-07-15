@@ -189,5 +189,5 @@ def does_policy_exist(jsonResponse):
 	if jsonResponse['groupAlreadyExists'] is True:
 		print "ERROR: A policy with this name already exists."
 		print "Re-run the import and create a policy with a new name."
-		#sys.exit(1)
+		sys.exit(1)
 
