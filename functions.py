@@ -2,7 +2,6 @@
 import sys
 import time
 import re
-import logging
 import json
 import requests
 import getpass
@@ -12,7 +11,6 @@ import components as pc
 requests.packages.urllib3.disable_warnings()
 session = requests.Session()
 
-log = logging.getLogger(__name__)
 
 
 def prettyPrint(entry):
@@ -85,17 +83,21 @@ def get_cbd_instance(src_or_dst):
 	return host.strip('/')
 
 def get_username_password(src_or_dst):
+	logger = logging.getLogger(__name__)
 	uname = raw_input("%s Username: " % (src_or_dst))
 	if not uname:
 		print "Error: Username cannot be blank. Rerun the tool."
+		logger.warn("Username was blank.  Rerun the tool.")
 		sys.exit(1)
 	pword = getpass.getpass("%s Password: " % (src_or_dst))
 	if not pword:
 		print "Error: Password cannot be blank. Rerun the tool."
+		logger.warn("Password cannot be blank.  Rerun the tool.")
 		sys.exit(1)
 	return uname, pword
 
 def get_policy_name(infile):
+	logger = logging.getLogger(__name__)
 	if isinstance(infile, basestring):
 		ppn = infile.split('.',1)[0]
 		print "DESTINATION Policy Name: %s" % (ppn)
@@ -106,6 +108,7 @@ def get_policy_name(infile):
 		pol_name = raw_input("DESTINATION Policy Name: ")
 		if not pol_name:
 			print "ERROR:  DESTINATION policy name cannot be blank.  Rerun the tool and provide a name."
+			logger.warn("Destination policy name was not input.")
 			sys.exit(1)
 	
 	return pol_name
@@ -115,6 +118,7 @@ def get_policy_description():
 	return pol_desc
 
 def get_policy_priority():
+	logger = logging.getLogger(__name__)
 	valid_pol_pris = ['LOW', 'MEDIUM', 'HIGH', 'MISSION_CRITICAL']
 	pol_pri = raw_input("DESTINATION Policy Target Value: LOW MEDIUM HIGH MISSION_CRITICAL: [MEDIUM] ")
 	if len(pol_pri) == 0:
@@ -140,6 +144,7 @@ def get_policy_priority_level():
 	
 
 def login(session, user, password, host, requestHeaders):
+	logger = logging.getLogger(__name__)
 	formdata = {'forward': '', 'email': user, 'password': password}
 	
 	url = host + '/checkAuthStrategy'
@@ -157,12 +162,16 @@ def login(session, user, password, host, requestHeaders):
 
 
 def web_get(session, uri, host, requestHeaders):
+	logger = logging.getLogger(__name__)
 	try:
 		url = host + uri
 		response = session.get(url, headers=requestHeaders, timeout=30)
 	except Exception as e:
-		print "GET request failed for the following URI: %s" % (url)
+		print "GET request failed for the following URL: %s" % (url)
 		print "Exception: %s" % (e)
+		logger = logging.getLogger(__name__)
+		logger.error("GET requests failed for the following URL = {0}".format(url))
+		logger.error("Exception details:\n", exc_info=True)
 		sys.exit(1)
 	try:
 		return response.json()
@@ -171,6 +180,7 @@ def web_get(session, uri, host, requestHeaders):
 		
 
 def web_post(session, uri, formdata, host, requestHeaders):
+	logger = logging.getLogger(__name__)
 	try:
 		url = host + uri
 		response = session.post(url, json=formdata, headers=requestHeaders, timeout=30)
@@ -179,15 +189,21 @@ def web_post(session, uri, formdata, host, requestHeaders):
 		else:
 			return response.text
 	except IOError as e:
-		print "POST request failed for the following URI: %s%s" % (host,uri)
+		print "POST request failed for the following URL: %s" % (url)
 		print "Exception: %s" % (e)
+		logger.error("POST request failed for the following URL = {0}".format(url))
+		logger.error("Exception details:\n", exc_info=True)
 		sys.exit(1)
 	print "URL = " + url + "\nStatus = " + str(response.status_code)
+	logger.info("URL = {0}".format(url))
+	logger.info("Status = {0}".format(response.status_code))
 	
 		
-def does_policy_exist(jsonResponse):
+def does_policy_exist(jsonResponse, policyName):
 	if jsonResponse['groupAlreadyExists'] is True:
-		print "ERROR: A policy with this name already exists."
+		print "ERROR: A policy with the name '{0}' already exists.".format(policyName)
 		print "Re-run the import and create a policy with a new name."
+		logger = logging.getLogger(__name__)
+		logger.error("A policy with the name '{0}' already exists.  Re-run the import and create a policy with an new name.".format(policyName))
 		sys.exit(1)
 

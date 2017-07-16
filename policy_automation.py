@@ -5,6 +5,7 @@ import csv
 import re
 import argparse
 import logging
+import logging.config
 import json
 import pprint
 import collections
@@ -19,8 +20,11 @@ except ImportError as e:
 import components as pc
 import functions as functs
 
+
+
 pp = pprint.PrettyPrinter(indent=4)
 session = requests.Session()
+
 
 def make_requestHeaders(place):
 	host = functs.get_cbd_instance(place)
@@ -48,7 +52,6 @@ def apply_changes(policyDescription, groupId, policyName, jsonPolicy, priorityLe
 			reader = csv.reader(f)
 			for row in reader:
 				rule_id = formdata['policy']['maxRuleId'] + 1
-				#rule_id = jsonPolicy['maxRuleId'] + 1
 				rule = {'required': 'false', 'id': rule_id}
 			
 				app_dict = {}
@@ -71,11 +74,14 @@ def apply_changes(policyDescription, groupId, policyName, jsonPolicy, priorityLe
 				formdata['policy']['maxRuleId'] = rule_id
 	
 	print "Inserting configuration and rules into policy id:  %i" % (groupId)
+	logger.info("Inserting configuration and rules into policy id = {0}".format(groupId))
 
 	uri = '/settings/groups/modify'
 	functs.web_post(session, uri, formdata, host, requestHeaders)
 	
 	print "Policy Import completed. Logging out."
+	logger.info("Policy import completed. Logging out.")
+
 	uri = '/logout'
 	functs.web_get(session, uri, host, requestHeaders)
 
@@ -93,10 +99,12 @@ def import_policy(infile, intype, host, requestHeaders):
 				"sourceGroupId": None}
 
 	print "Creating Policy: %s" % (policyName)
+	logger.info("Creating policy = {0}".format(policyName))
+
 	uri = '/settings/groups/add'
 	response = functs.web_post(session, uri, formdata, host, requestHeaders)
 
-	functs.does_policy_exist(response)
+	functs.does_policy_exist(response, policyName)
 
 	groupId = response['addedDeviceGroupId']
 
@@ -113,13 +121,14 @@ def import_policy(infile, intype, host, requestHeaders):
 		infile = ''
 	else:
 		print "Error:  Import Policy called for an unsupported format."
+		logger.error("Error: import_policy function called for an unsupported format. Format = {0}".format(intype))
 		sys.exit(1)
 	
 	apply_changes(policyDescription, groupId, policyName, jsonPolicy, priorityLevel, infile, host, requestHeaders)
 
 def import_certs(infile, host, requestHeaders):
 	uri = '/settings/hashentry/add'
-	with open (infile, 'rb') as f:
+	with open (infile, 'rU') as f:
 		reader = csv.reader(f)
 		for row in reader:
 			formdata = {}
@@ -128,10 +137,15 @@ def import_certs(infile, host, requestHeaders):
 			formdata['reputationOverrideType'] = "CERT"
 			formdata['value1'] = row[2]
 			formdata['value2'] = row[4]
+			
 			print "Adding Certificate: %s" % (formdata['description'])
+			logger.info("Added Certificate = {0}".format(formdata['description']))
+			
 			response = functs.web_post(session, uri, formdata, host, requestHeaders)
 	
 	print "Certificate Import completed. Logging out."
+	logger.info("Certificate import completed.  Logging out.")
+	
 	uri = '/logout'
 	functs.web_get(session, uri, host, requestHeaders)	  			
 
@@ -143,15 +157,19 @@ def import_searches(infile, host, requestHeaders):
 	#  when the search is saved
 	url = host + '/userInfo'
 	response = session.get(url, headers=requestHeaders, timeout=30)
+	
 	if 'currentOrgId' in response.json() and response.json()['currentOrgId'] is not None:
 		orgId = json.dumps(response.json()['currentOrgId']).replace('"', '')
 	else:
 		print "No OrgId found exiting."
+		logger.error("No OrgId found. Exiting search import.")
 		sys.exit(1)
+	
 	if 'loginId' in response.json() and response.json()['loginId'] is not None:
 		loginId = json.dumps(response.json()['loginId']).replace('"', '')
 	else:
 		print "No loginId found, exiting."
+		logger.error("No loginId found.  Exiting search import.")
 		sys.exit(1)
 	
 	# Setting the Referer header just in case this is why the server didn't work for me.
@@ -161,7 +179,7 @@ def import_searches(infile, host, requestHeaders):
 	#  Field 0 = search box contents
 	#  Field 1 = search timeframe
 	#  Field 2 = Name of search
-	with open (infile, 'rb') as f:
+	with open (infile, 'rU') as f:
 		reader = csv.reader(f)
 		for row in reader:
 			# contents of the form are taken from /investigate/events/find as seen in chrome dev tools
@@ -186,12 +204,17 @@ def import_searches(infile, host, requestHeaders):
 			
 			
 			print "Adding search: %s" % (row[2])
+			logger.info("Adding search {0}".format(row[2]))
+
 			uri = '/searchdefs/save'
 			response = functs.web_post(session, uri, formdata, host, requestHeaders)
+			
 			print response.headers
 			print response.content
 	
 	print "Search Import completed. Logging out."
+	logger.info("Search import completed. Logging out.")
+	
 	uri = '/logout'
 	functs.web_get(session, uri, host, requestHeaders)
 
@@ -216,13 +239,21 @@ def export_policy(exp_type, host, requestHeaders):
 			menu_number += 1
 	
 		pol_id = int(raw_input("Choose the number for your SOURCE Policy: "))
+		
 		if pol_id < menu_number:
 			pol_name = pol_names[int(pol_id)]
+			
 			print "SOURCE Policy Name: %s" % (pol_name)
+			logger.info("Source Policy Name = {0}".format(pol_name))
+			
 			groupId = policies[pol_name]['id']
+			
 			print 'SOURCE Policy ID: %i' % (groupId)
+			logger.info("Source Policy ID = {0}".format(groupId))
+			
 		else:
 			print "Invalid SOURCE Policy choice received.  Rerun the script and retry."
+			logger.info("Tool exited because user input Number = {0} but Max Policy Number was {1}".format(pol_id, menu_number))
 			sys.exit(1)
 	
 	uri = '/settings/policy/%i/details' % (groupId)
@@ -240,6 +271,9 @@ def export_policy(exp_type, host, requestHeaders):
 				outfile = args.output
 			with open(outfile, 'w') as outf:
 				outf.write(jsonResponse)
+			
+			logger.info("Exported policy '{0}' to file '{1}'".format(pol_name, outfile))
+		
 		elif exp_type == 'to_json_memory':
 			policyDescription = response['description']
 			groupId = response['id']
@@ -247,8 +281,11 @@ def export_policy(exp_type, host, requestHeaders):
 			jsonPolicy = response['policy']
 			priorityLevel = response['priorityLevel']
 			return policyDescription, groupId, policyName, jsonPolicy, priorityLevel
+		
 		else:
 			print "Export type not specified.  No data exported."
+			logger.info("Exited the tool because the policy output type was not 'to_json_file' or 'to_json_memory'")
+			sys.exit(1)
 
 def edit_policy(policyDescription, groupId, policyName, jsonPolicy, priorityLevel, infile, host, requestHeaders):
 
@@ -256,59 +293,85 @@ def edit_policy(policyDescription, groupId, policyName, jsonPolicy, priorityLeve
 	fo_name = "%s_orig.json" % (str(groupId))
 	with open(fo_name, 'w') as fo:
 		json.dump(jsonPolicy, fo, indent=4, sort_keys=True)
+	logger.info("Backed up {0} to file {1} prior to applying edits".format(policyName, fo_name))
 	
 	apply_changes(policyDescription, groupId, policyName, jsonPolicy, priorityLevel, infile, host, requestHeaders)
 
 
 def main():
 	functs.check_request_version()
-	log = logging.getLogger(__name__)
+	
+	if args.action:
+		logger.info("action = {0}".format(args.action))
 	
 	if args.action == 'export_json':
 		print "\n##### Begin Policy Export #####"
 		host, requestHeaders = make_requestHeaders('SOURCE')
+		logger.info("server = {0}".format( host))
+		
 		export_policy('to_json_file', host, requestHeaders)
 		
 	elif args.action == 'import_csv':
 		if not args.input:
 			args.input = raw_input("No Input file specified.\nWhat CSV file contains the rules to import?: ")
 		print "Using %s as rule source" % (args.input)
+		
 		print "\n##### Begin Policy Import #####"
 		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("server = {0}".format(host))
+		logger.info("CSV Source = {0}".format(args.input))
+		
 		import_policy(args.input, 'from_csv', host, requestHeaders)
 	
 	elif args.action == 'import_json':
 		if not args.input:
 			args.input = raw_input("No Input file specified.\nWhat JSON file contains the policy to import?: ")
 		print "Using %s as rule source" % (args.input)
+		
 		print "\n##### Begin Policy Import #####"
 		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("server = {0}".format(host))
+		logger.info("JSON source = {0}".format(args.input))
+		
 		import_policy(args.input, 'from_json_file', host, requestHeaders)
 	
 	elif args.action == 'import_certs':
 		if not args.input:
 			args.input = raw_input("No Input file specified.\nWhat CSV file contains the certs to import?: ")
 		print "Using %s as cert source" % (args.input)
+		
 		print "\n##### Begin Certificate Import #####"
 		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("server = {0}".format(host))
+		logger.info("Cert CSV = {0}".format(args.input))
+		
 		import_certs(args.input, host, requestHeaders)
 	
 	elif args.action == 'import_searches':
 		if not args.input:
 			args.input = raw_input("No Input file specified.\nWhat CSV file contains the queries to import?: ")
 		print "Using %s as query source" % (args.input)
-		print "\n##### Begin Query Import #####"
+		
+		print "\n##### Begin Search Import #####"
 		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("server = {0}".format(host))
+		logger.info("Search CSV = {0}".format(args.input))
+		
 		import_searches(args.input, host, requestHeaders)
 	
 	elif args.action == 'transfer':
 		print "\n##### Begin Policy Export #####"
 		host, requestHeaders = make_requestHeaders('SOURCE')
+		logger.info("Source server = {0}".format(host))
+		
 		policyDescription, groupId, policyName, jsonPolicy, priorityLevel = export_policy('to_json_memory', host, requestHeaders)
 		#jsonPolicy is the only variable used for transfer, but define all because edit_policy needs them
+		logger.info("Exported Policy Name = {0}".format(policyName))
 		
 		print "\n##### Begin Policy Import #####"
 		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("Destination server = {0}".format(host))
+		
 		import_policy(jsonPolicy, 'from_json_memory', host, requestHeaders)
 	
 	elif args.action == 'edit_policy':
@@ -317,13 +380,18 @@ def main():
 		print "Using %s as rule source" % (args.input)
 		infile = args.input
 
-		host, requestHeaders = make_requestHeaders('DESTINATION')
-		policyDescription, groupId, policyName, jsonPolicy, priorityLevel = export_policy('to_json_memory', host, requestHeaders)
 		print "\n##### Begin Policy Edit #####"
+		host, requestHeaders = make_requestHeaders('DESTINATION')
+		logger.info("server = {0}".format(host))
+		logger.info("Edits CSV = {0}".format(args.input))
+		
+		policyDescription, groupId, policyName, jsonPolicy, priorityLevel = export_policy('to_json_memory', host, requestHeaders)
+		logger.info("Edited Policy Name = {0}".format(policyName))
+
 		edit_policy(policyDescription, groupId, policyName, jsonPolicy, priorityLevel, infile, host, requestHeaders)
 
 	else:
-		print "Error: action was not one of 'export_json/import_csv/import_json/transfer/import_cert'."
+		print "Error: action was not one of 'export_json/import_csv/import_json/transfer/import_certs'."
 		print "Please rerun the script providing a correct action argument"
 
 
@@ -334,6 +402,10 @@ if __name__ == "__main__":
 	parser.add_argument("-i", "--input", help="File containing rules or policy to import.")
 	parser.add_argument("-o", "--output", help="File to which to write policy JSON. Just in case you wish to verify the JSON.")
 	args = parser.parse_args()
+	
+	logging.config.fileConfig('logging.conf')
+	logger = logging.getLogger(__name__)
+	logger.info("Policy Automation Tool Started")
 	
 	main()
 
