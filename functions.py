@@ -1,11 +1,13 @@
 #!/usr/bin/python
+import getpass
+import json
+import logging
+import re
+import requests
+import requests.packages.urllib3
 import sys
 import time
-import re
-import json
-import requests
-import getpass
-import requests.packages.urllib3
+
 import components as pc
 
 requests.packages.urllib3.disable_warnings()
