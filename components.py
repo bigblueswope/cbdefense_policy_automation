@@ -78,7 +78,7 @@ policy_template = {
             "schedule": {
                 "fullIntervalHours": 0, 
                 "initialRandomDelayHours": 1, 
-                "intervalHours": 4
+                "intervalHours": 2
             }
         }, 
         "updateServers": {
@@ -172,7 +172,7 @@ policy_template = {
         }, 
         {
             "name": "DELAY_EXECUTE", 
-            "value": "false"
+            "value": "true"
         }, 
         {
             "name": "SCAN_NETWORK_DRIVE", 
