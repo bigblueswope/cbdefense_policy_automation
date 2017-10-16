@@ -25,7 +25,10 @@ operations = {
     'Tries to invoke an untrusted application': 'POL_INVOKE_NOT_TRUSTED',
     'Tries to run or is running': 'RUN',
     'Tries to scrape memory of another process': 'MEMORY_SCRAPE',
-	'Tries to perform any operations': 'BYPASS_ALL'
+	'Tries to perform any operations': 'BYPASS_ALL',
+    'Tries to invoke a command interpreter': 'INVOKE_CMD_INTERPRETER',
+    'Performs ransomware-like behavior': 'RANSOM',
+    'Tries to execute a fileless script': 'INVOKE_SCRIPT'
 }
 
 actions = {
@@ -37,6 +40,12 @@ actions = {
 
 policy_template = {
     "avSettings": {
+        "apc": {
+            "enabled": "false", 
+            "maxExeDelay": 45, 
+            "maxFileSize": 4, 
+            "riskLevel": 4
+        }, 
         "features": [
             {
                 "enabled": "true", 
@@ -48,7 +57,7 @@ policy_template = {
             }, 
             {
                 "enabled": "true", 
-                "name": "ONDEMOND_SCAN"
+                "name": "ONDEMAND_SCAN"
             }
         ], 
         "onAccessScan": {
@@ -65,12 +74,11 @@ policy_template = {
                 "startHour": 0
             }
         }, 
-        "settings": None, 
         "signatureUpdate": {
             "schedule": {
                 "fullIntervalHours": 0, 
                 "initialRandomDelayHours": 1, 
-                "intervalHours": 2
+                "intervalHours": 4
             }
         }, 
         "updateServers": {
@@ -124,7 +132,7 @@ policy_template = {
         }, 
         {
             "name": "QUARANTINE_DEVICE_MESSAGE", 
-            "value": "Device has been quarantined by your computer administrator."
+            "value": "Your device has been quarantined. Please contact your administrator."
         }, 
         {
             "name": "SET_SENSOR_MODE", 
@@ -152,7 +160,7 @@ policy_template = {
         }, 
         {
             "name": "HASH_MD5", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "SCAN_LARGE_FILE_READ", 
@@ -164,11 +172,11 @@ policy_template = {
         }, 
         {
             "name": "DELAY_EXECUTE", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "SCAN_NETWORK_DRIVE", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "BYPASS_AFTER_LOGIN_MINS", 
@@ -181,12 +189,19 @@ policy_template = {
         {
             "name": "SHOW_FULL_UI", 
             "value": "false"
-        },
+        }, 
         {
-            "name": "SECURITY_CENTER_OPT",
+            "name": "SECURITY_CENTER_OPT", 
+            "value": "true"
+        }, 
+        {
+            "name": "CB_LIVE_RESPONSE", 
+            "value": "false"
+        }, 
+        {
+            "name": "UNINSTALL_CODE", 
             "value": "false"
         }
     ], 
     "updateVersion": 0
 }
-
