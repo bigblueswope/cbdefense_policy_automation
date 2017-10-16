@@ -25,7 +25,7 @@ operations = {
     'Tries to invoke an untrusted application': 'POL_INVOKE_NOT_TRUSTED',
     'Tries to run or is running': 'RUN',
     'Tries to scrape memory of another process': 'MEMORY_SCRAPE',
-	'Tries to perform any operations': 'BYPASS_ALL',
+    'Tries to perform any operations': 'BYPASS_ALL',
     'Tries to invoke a command interpreter': 'INVOKE_CMD_INTERPRETER',
     'Performs ransomware-like behavior': 'RANSOM',
     'Tries to execute a fileless script': 'INVOKE_SCRIPT'
