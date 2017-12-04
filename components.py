@@ -41,51 +41,51 @@ actions = {
 policy_template = {
     "avSettings": {
         "apc": {
-            "enabled": "false", 
+            "enabled": false, 
             "maxExeDelay": 45, 
             "maxFileSize": 4, 
             "riskLevel": 4
         }, 
         "features": [
             {
-                "enabled": "true", 
+                "enabled": false, 
                 "name": "SIGNATURE_UPDATE"
             }, 
             {
-                "enabled": "true", 
+                "enabled": true, 
                 "name": "ONACCESS_SCAN"
             }, 
             {
-                "enabled": "true", 
+                "enabled": false, 
                 "name": "ONDEMAND_SCAN"
             }
         ], 
         "onAccessScan": {
-            "profile": "AGGRESSIVE"
+            "profile": "NORMAL"
         }, 
         "onDemandScan": {
             "profile": "NORMAL", 
             "scanCdDvd": "AUTOSCAN", 
             "scanUsb": "AUTOSCAN", 
             "schedule": {
-                "days": None, 
-                "rangeHours": 0, 
-                "recoveryScanIfMissed": "true", 
-                "startHour": 0
+                "days": null, 
+                "rangeHours": 8, 
+                "recoveryScanIfMissed": true, 
+                "startHour": 20
             }
         }, 
         "signatureUpdate": {
             "schedule": {
                 "fullIntervalHours": 0, 
-                "initialRandomDelayHours": 1, 
-                "intervalHours": 2
+                "initialRandomDelayHours": 4, 
+                "intervalHours": 4
             }
         }, 
         "updateServers": {
             "servers": [
                 {
                     "flags": 0, 
-                    "regId": None, 
+                    "regId": null, 
                     "server": [
                         "http://updates.cdc.carbonblack.io/update"
                     ]
@@ -95,64 +95,40 @@ policy_template = {
                 "http://updates.cdc.carbonblack.io/update"
             ], 
             "serversOverride": [], 
-            "useServersOverride": "false"
+            "useServersOverride": false
         }
     }, 
     "directoryActionRules": [], 
     "id": -1, 
-    "maxRuleId": 0, 
-    "mobileSensorSettings": None, 
-    "phishingSettings": None, 
+    "maxRuleId": 8, 
+    "mobileSensorSettings": null, 
+    "phishingSettings": null, 
     "rules": [], 
-    "sensorAutoUpdateEnabled": "true", 
+    "sensorAutoUpdateEnabled": true, 
     "sensorSettings": [
-        {
-            "name": "ALLOW_UNINSTALL", 
-            "value": "true"
-        }, 
         {
             "name": "ALLOW_UPLOADS", 
             "value": "true"
         }, 
         {
             "name": "SHOW_UI", 
-            "value": "true"
-        }, 
-        {
-            "name": "ENABLE_THREAT_SHARING", 
-            "value": "true"
-        }, 
-        {
-            "name": "QUARANTINE_DEVICE", 
             "value": "false"
-        }, 
-        {
-            "name": "LOGGING_LEVEL", 
-            "value": "NORMAL"
-        }, 
-        {
-            "name": "QUARANTINE_DEVICE_MESSAGE", 
-            "value": "Your device has been quarantined. Please contact your administrator."
-        }, 
-        {
-            "name": "SET_SENSOR_MODE", 
-            "value": "0"
-        }, 
-        {
-            "name": "SENSOR_RESET", 
-            "value": "0"
         }, 
         {
             "name": "BACKGROUND_SCAN", 
             "value": "false"
         }, 
         {
-            "name": "POLICY_ACTION_OVERRIDE", 
-            "value": "true"
+            "name": "QUARANTINE_DEVICE_MESSAGE", 
+            "value": "Device has been quarantined by your computer administrator."
         }, 
         {
-            "name": "HELP_MESSAGE", 
-            "value": ""
+            "name": "LOGGING_LEVEL", 
+            "value": "NORMAL"
+        }, 
+        {
+            "name": "QUARANTINE_DEVICE", 
+            "value": "false"
         }, 
         {
             "name": "PRESERVE_SYSTEM_MEMORY_SCAN", 
@@ -167,11 +143,11 @@ policy_template = {
             "value": "false"
         }, 
         {
-            "name": "SCAN_EXECUTE_ON_NETWORK_DRIVE", 
+            "name": "POLICY_ACTION_OVERRIDE", 
             "value": "true"
         }, 
         {
-            "name": "DELAY_EXECUTE", 
+            "name": "ALLOW_UNINSTALL", 
             "value": "true"
         }, 
         {
@@ -187,12 +163,16 @@ policy_template = {
             "value": "0"
         }, 
         {
-            "name": "SHOW_FULL_UI", 
-            "value": "false"
+            "name": "SCAN_EXECUTE_ON_NETWORK_DRIVE", 
+            "value": "true"
+        }, 
+        {
+            "name": "DELAY_EXECUTE", 
+            "value": "true"
         }, 
         {
             "name": "SECURITY_CENTER_OPT", 
-            "value": "true"
+            "value": "false"
         }, 
         {
             "name": "CB_LIVE_RESPONSE", 
