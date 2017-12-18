@@ -41,22 +41,22 @@ actions = {
 policy_template = {
     "avSettings": {
         "apc": {
-            "enabled": false, 
+            "enabled": "false", 
             "maxExeDelay": 45, 
             "maxFileSize": 4, 
             "riskLevel": 4
         }, 
         "features": [
             {
-                "enabled": false, 
+                "enabled": "false", 
                 "name": "SIGNATURE_UPDATE"
             }, 
             {
-                "enabled": true, 
+                "enabled": "true", 
                 "name": "ONACCESS_SCAN"
             }, 
             {
-                "enabled": false, 
+                "enabled": "false", 
                 "name": "ONDEMAND_SCAN"
             }
         ], 
@@ -68,9 +68,9 @@ policy_template = {
             "scanCdDvd": "AUTOSCAN", 
             "scanUsb": "AUTOSCAN", 
             "schedule": {
-                "days": null, 
+                "days": None, 
                 "rangeHours": 8, 
-                "recoveryScanIfMissed": true, 
+                "recoveryScanIfMissed": "true", 
                 "startHour": 20
             }
         }, 
@@ -85,7 +85,7 @@ policy_template = {
             "servers": [
                 {
                     "flags": 0, 
-                    "regId": null, 
+                    "regId": None, 
                     "server": [
                         "http://updates.cdc.carbonblack.io/update"
                     ]
@@ -95,16 +95,16 @@ policy_template = {
                 "http://updates.cdc.carbonblack.io/update"
             ], 
             "serversOverride": [], 
-            "useServersOverride": false
+            "useServersOverride": "false"
         }
     }, 
     "directoryActionRules": [], 
     "id": -1, 
     "maxRuleId": 8, 
-    "mobileSensorSettings": null, 
-    "phishingSettings": null, 
+    "mobileSensorSettings": None, 
+    "phishingSettings": None, 
     "rules": [], 
-    "sensorAutoUpdateEnabled": true, 
+    "sensorAutoUpdateEnabled": "true", 
     "sensorSettings": [
         {
             "name": "ALLOW_UPLOADS", 
